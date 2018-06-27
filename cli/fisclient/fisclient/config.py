@@ -29,9 +29,9 @@ CONFIG_VAR = ('OS_ACCESS_KEY', 'OS_SECRET_KEY', 'OS_REGION_ID',
 
 endpoints = {
     'eu-de': {
-        'obs': 'obs.eu-de.otc.t-systems.com',
-        'iam': 'iam.eu-de.otc.t-systems.com',
-        'fis': 'ecs.eu-de.otc.t-systems.com',
+        'obs': 'obs.eu-de.otctest.t-systems.com',
+        'iam': 'iam.eu-de.otctest.t-systems.com',
+        'fis': 'ecs.eu-de.otctest.t-systems.com',
     },
 }
 
