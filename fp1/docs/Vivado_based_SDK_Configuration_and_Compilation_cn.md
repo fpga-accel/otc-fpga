@@ -12,7 +12,7 @@
 配置环境
 ------------
 ```
-cd huaweicloud-fpga/fp1/
+cd otc-fpga/fp1/
 source setup.sh
 ```
 
@@ -24,7 +24,7 @@ source setup.sh
 
 ### 编译方法
 ```
-cd huaweicloud-fpga/fp1/software/userspace/dpdk_src  
+cd otc-fpga/fp1/software/userspace/dpdk_src  
 chmod +x build_dpdk.sh  
 sh build_dpdk.sh 
 ```
@@ -38,7 +38,7 @@ sh build_dpdk.sh
 ### 编译方法
 
 ```
-cd huaweicloud-fpga/fp1/software/app/dpdk_app/
+cd otc-fpga/fp1/software/app/dpdk_app/
 chmod +x build_dpdk_app.sh 
 sh build_dpdk_app.sh
 ```

@@ -6,12 +6,18 @@
 
 # 目录结构
 [template_XX](#template_XX_dir)/  
+
 template_cl
 --------------------------------
+
 基于opencl c实现kernel的模板
+
 template_c
 --------------------------------
+
 基于c实现kernel的模板
+
 template_rtl
 --------------------------------
+
 基于rtl实现kernel的模板

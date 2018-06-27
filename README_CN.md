@@ -1,4 +1,4 @@
-﻿# FPGA开发套件
+# FPGA开发套件
 [Switch to the English version](./README.md)
 
 # 目录
@@ -6,7 +6,7 @@
 + [1 认识基于FP1平台的FPGA开发套件](#sec_1)
   + [1.1 关于开发套件](#sec_1_1)
   + [1.2 使用前准备](#sec_1_2)
-+ [2 高性能架构FPGA开发指南（暂未开放）](#sec_2)
++ [2 高性能架构FPGA开发指南（此实例暂未开放）](#sec_2)
   + [2.1 高性能架构硬件开发流程](#sec_2_1)
   + [2.2 高性能架构软件开发流程](#sec_2_2)
   + [2.3 使用基于vivado的Example](#sec_2_3)
@@ -38,13 +38,13 @@
 
 <a name="sec_1_2_2"></a>
 ### 1.2.2 配置内网DNS
-在配置内网DNS后，弹性云服务器可以通过虚拟私有云的内网访问相关云服务，能够为用户提供更稳定、可靠的网络环境。更多详细信息请参见[FACS用户指南](https://support.huaweicloud.com/usermanual-fpga/zh-cn_topic_0069154765.html)的“配置内网DNS”章节。
+在配置内网DNS后，弹性云服务器可以通过虚拟私有云的内网访问相关云服务，能够为用户提供更稳定、可靠的网络环境。更多详细信息请参见《FPGA Accelerated Cloud Server User Guide》中“Configuring Intranet DNS”章节。
 
 <a name="sec_1_2_3"></a>
 ### 1.2.3 FPGA镜像管理工具的安装和配置
 FPGA镜像管理工具fisclient是一款跨平台命令行工具，用于FPGA镜像管理，而镜像管理是进行FPGA镜像加载前的必须步骤。通过fisclient，用户可以实现FPGA镜像的删除、查询等操作。此外，fisclient还提供了FPGA镜像（AEI，Accelerated Engine Image）和弹性云服务器镜像之间关联关系的管理功能。用户在创建AEI和弹性云服务器镜像之间的关联关系后，可以将弹性云服务器镜像发布到云市场或共享给其他用户，从而实现将AEI发布到云市场或共享给其他用户。
 
-> 管理工具的安装和配置请参见[fisclient README](./cli/fisclient/README.md)安装和配置部分。
+> 管理工具的安装和配置请参见[fisclient README](./cli/fisclient/README_CN.md)安装和配置部分。
 
 ### 1.2.4 检查依赖包
 在使用FPGA应用开发套件时需要依赖kernel-devel软件包进行驱动编译，因此在使用开发套件前需要检查kernel-devel是否已正确安装。
@@ -54,6 +54,8 @@ FPGA镜像管理工具fisclient是一款跨平台命令行工具，用于FPGA镜
 
 <a name="sec_2"></a>
 # 2 高性能架构FPGA开发指南（此实例暂未开放）
+注意：**此实例暂未开放，请选择使用通用型架构FPGA。**
+
 高性能架构FPGA开发包括硬件开发、软件开发和使用Example三个场景。在硬件开发场景下，用户通过使用基于vivado的工具套件完成FPGA镜像文件的生成和注册；在软件开发场景下，用户可基于已有的FPGA镜像文件开发自己的应用；在使用Example时，用户可以通过示例的使用快速掌握在当前服务器架构下的FPGA开发流程。
 
 + [2.1 高性能架构硬件开发流程](#sec_2_1)

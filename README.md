@@ -6,7 +6,7 @@
 + [1 FP1-based FPGA Development Suite](#sec_1)
   + [1.1 Overview](#sec_1_1)
   + [1.2 Preparations](#sec_1_2)
-+ [2 FPGA Development Guide for High-Performance Architecture(Not avalible)](#sec_2)
++ [2 FPGA Development Guide for High-Performance Architecture(This instance is not yet avalible)](#sec_2)
   + [2.1 Hardware Development Process](#sec_2_1)
   + [2.2 Software Development Process](#sec_2_2)
   + [2.3 Using a Vivado-Based Example](#sec_2_3)
@@ -38,7 +38,7 @@ Before using the FPGA development suite, you must perform 1.2.1~1.2.4 steps to c
 
 <a name="sec_1_2_2"></a>
 ### 1.2.2 Configuring Intranet DNS 
-After the intranet DNS is configured, the ECS can access relevant cloud services through the intranet of the virtual private cloud, providing users with a more stable and reliable network environment. For more information, see the "Configuring Intranet DNS" section in the [FACS User's Guide](https://support.huaweicloud.com/usermanual-fpga/en-us_topic_0069154765.html). 
+After the intranet DNS is configured, the ECS can access relevant cloud services through the intranet of the virtual private cloud, providing users with a more stable and reliable network environment. For more information, see the "Configuring Intranet DNS" section in the "FPGA Accelerated Cloud Server User Guide". 
 
 <a name="sec_1_2_3"></a>
 ### 1.2.3 configuring and Installing the FPGA Image Management Tool
@@ -54,7 +54,9 @@ When using the FPGA SDK (software development kit), kernel-devel package is requ
 
 
 <a name="sec_2"></a>
-# 2 FPGA Development Guide for High-Performance Architecture(This feature is not yet avalible)
+# 2 FPGA Development Guide for High-Performance Architecture(This instance is not yet avalible)
+NOTE: **This instance is not yet avalible，please choose the instance for general-purpose FPGA architecture.**
+
 When a high-performance architecture is used, the FPGA development is divided to three scenarios: hardware development, software development, and example using. During hardware development, you can generate and register an FPGA image by using the Vivado tools. During software development, you can develop applications based on the existing FPGA image. By using examples, you can quickly master the FPGA development process under the current server architecture.
 
 + [2.1 Hardware Development Process](#sec_2_1)

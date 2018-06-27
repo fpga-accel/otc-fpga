@@ -8,7 +8,7 @@
 <ul>
 <li><a href="#sec-1">1. <b>子目录结构</b></a></li>
 <li><a href="#sec-2">2. <b>子目录说明</b></a></li>
-<li><a href="#sec-3">3. <b>华为fpga云服务硬件开发说明</b></a>
+<li><a href="#sec-3">3. <b>fpga云服务硬件开发说明</b></a>
 <ul>
 <li><a href="#sec-3-1">3.1. <b>申请实例</b></a></li>
 </ul>
@@ -78,9 +78,9 @@
 
 <a id="sec-3" name="sec-3"></a>
 
-## 3. 华为fpga云服务硬件开发说明
+## 3. fpga云服务硬件开发说明
 
-华为FPGA云服务提供了基于vivado rtl的开发模式和基于SDAccel的c/c++/opencl等语言开发模式。用户可以依据自身的情况灵活选择开发模式，并在对应的目录结构下完成自己的加速设计。
+FPGA云服务提供了基于vivado rtl的开发模式和基于SDAccel的c/c++/opencl等语言开发模式。用户可以依据自身的情况灵活选择开发模式，并在对应的目录结构下完成自己的加速设计。
 
 - Vivado rtl的开发模式
 
@@ -94,7 +94,7 @@
 2.支持SDAccel开发流程，用户灵活选择使用c/c++/opencl语言进行开发、仿真和测试。
 3.对应的目录结构为 **sdaccel_design**。
 
-说明：华为fpga云服务硬件开发只能用于**centos7.3**系统，并提供了所有的设计文件和脚本，用户可以在fpga云服务器上使用预安装的工具进行**开发、仿真和[构建AEI](../docs/Register an FPGA image_cn.md)**。
+说明：fpga云服务硬件开发只能用于**centos7.3**系统，并提供了所有的设计文件和脚本，用户可以在fpga云服务器上使用预安装的工具进行**开发、仿真和[构建AEI](../docs/Register an FPGA image_cn.md)**。
 
 <a id="sec-3-1" name="sec-3-1"></a>
 
@@ -181,9 +181,9 @@ mmult_hls、vadd_cl、vadd_rtl为通用型架构的样例，功能介绍见[OCL 
 
 ### 3.5 用户逻辑仿真
 
-- 用户可以使用华为fpga云服务自带的Vivado XSIM仿真器进行仿真，用户也可以依据自己的习惯选择购买和安装自己的仿真器。
-- 华为fpga云服务提供的仿真平台支持Synopsys公司的VCS, Mentor的Questasim以及Vivado仿真器。
-- 用户也可以使用华为fpga云服务提供的sdaccel工具套件配套的仿真器进行仿真，用户也可以依据自己的习惯选择购买和安装自己的仿真器。
+- 用户可以使用fpga云服务自带的Vivado XSIM仿真器进行仿真，用户也可以依据自己的习惯选择购买和安装自己的仿真器。
+- fpga云服务提供的仿真平台支持Synopsys公司的VCS, Mentor的Questasim以及Vivado仿真器。
+- 用户也可以使用fpga云服务提供的sdaccel工具套件配套的仿真器进行仿真，用户也可以依据自己的习惯选择购买和安装自己的仿真器。
 - 用户仿真的详细步骤可查看[仿真平台快速指南](./vivado_design/lib/sim/doc/quick_start_cn.md)；
 - 用户也可通过查看[仿真平台用户指导](./vivado_design/lib/sim/doc/user_guide_cn.md)获得详细的仿真平台接口说明以及详细方案。
 

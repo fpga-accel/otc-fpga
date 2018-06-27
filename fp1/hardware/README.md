@@ -80,7 +80,7 @@
 
 ## 3 Description of FAC-Based Hardware Development
 
-Huawei FPGA Accelerated Cloud (FAC) services provide Vivado-based development mode using RTL and SDAccel-based development mode using C, C++, and OpenCl. You can flexibly choose a development mode as required and complete the acceleration design in the corresponding directory structure.
+FPGA Accelerated Cloud (FAC) services provide Vivado-based development mode using RTL and SDAccel-based development mode using C, C++, and OpenCl. You can flexibly choose a development mode as required and complete the acceleration design in the corresponding directory structure.
 
 - Vivado Development Mode Using RTL
 

@@ -339,10 +339,13 @@ elif [ $quit_script == 1 ] ; then
 fi
 
 # Show Fpga Develop Mode
-if [ $fpga_dev_mode == 1 -o $FPGA_DEVELOP_MODE != "vivado" ] ; then
+if [ $fpga_dev_mode == 1 -o $FPGA_DEVELOP_MODE == "vivado" ] ; then
+    dev_mode_name="Vivado"
+elif [ $fpga_dev_mode == 1 -o $FPGA_DEVELOP_MODE == "sdx" ] ; then
     dev_mode_name="SDAccel"
 else
-    dev_mode_name="Vivado"
+    echo "Error: Fpga develop mode is '$FPGA_DEVELOP_MODE' , The correct configuration is vivado or sdx"
+    return
 fi
 
 echo
@@ -1111,7 +1114,7 @@ if [ $quit_script != 1 ];then
         echo "ERROR:Your project is Incomplete,please update your Project"
     elif [ "$obs_version_note" != "$local_version_note" ];then
         quit_script=1
-        echo  "Warning:your version is not the latest,please update the local file from github"
+        echo  "Info: your local version is different with the OBS latest version, local version is $local_version_note, OBS latest version is $obs_version_note"
     fi
 fi
 #If vresion not match , error will not cause quit of shell.

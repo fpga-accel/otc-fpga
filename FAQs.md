@@ -27,21 +27,21 @@ SDK is short for Software Development Kit, including the drivers, tools, running
 
 
 ## Application Market
-**Q: What is Huawei Cloud FPGA Marketplace?**
+**Q: What is Cloud FPGA Marketplace?**
 
-FPGA developers can share or sell their AEI files to other FPGA users on the Huawei Cloud FPGA Marketplace. 
+FPGA developers can share or sell their AEI files to other FPGA users on the Cloud FPGA Marketplace. 
 
 
 ## Development Language
-**Q: What development languages does Huawei Cloud FPGA support?**
+**Q: What development languages does Cloud FPGA support?**
 
-Currently, two types of Huawei Cloud FPGA are available: general-purpose (OpenCL) and high-performance (DPDK). OpenCL is developed by using the C language, and the DPDK is developed by using the Verilog hardware language.
+Currently, two types of Cloud FPGA are available: general-purpose (OpenCL) and high-performance (DPDK). OpenCL is developed by using the C language, and the DPDK is developed by using the Verilog hardware language.
 
 
 ## FPGA
-**Q: What is the FPGA model used by Huawei Cloud FPGA?**
+**Q: What is the FPGA model used by Cloud FPGA?**
 
-Currently, Huawei Cloud FPGA uses Xilinx UltraScale+ series xcvu9p-flgb2104-2-i cards.
+Currently, Cloud FPGA uses Xilinx UltraScale+ series xcvu9p-flgb2104-2-i cards.
 
 
 ## FPGA Shell

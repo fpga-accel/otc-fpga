@@ -6,13 +6,19 @@ This directory stores `project directory templates`, aiming to standardizing and
 
 # Directory Structure
 [template_XX](#template_XX_dir)/  
+
 template_cl
 --------------------------------
+
 OpenCL C-based template for kernel development
+
 template_c
 --------------------------------
+
 C-based template for kernel development
+
 template_rtl
 --------------------------------
+
 RTL-based template for kernel development
 

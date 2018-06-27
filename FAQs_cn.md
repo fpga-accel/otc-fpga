@@ -27,21 +27,21 @@ SDK是Software Development Kit的缩写，即软件开发套件。SDK主要包�
 
 
 ## 应用市场
-**Q: Huawei Cloud FPGA Marketplace是什么？**
+**Q: Cloud FPGA Marketplace是什么？**
 
-FPGA开发人员可以使用Marketplace将他们的AEI文件共享或出售给其他Huawei Cloud FPGA用户。 
+FPGA开发人员可以使用Marketplace将他们的AEI文件共享或出售给其他Cloud FPGA用户。 
 
 
 ## 开发语言
-**Q: Huawei Cloud FPGA支持哪些开发语言?**
+**Q: Cloud FPGA支持哪些开发语言?**
 
-目前Huawei Cloud FPGA有通用型（OpenCL）和高性能型（DPDK）两种，OpenCL主要采用C语言开发，而DPDK主要使用Verilog硬件语言开发。
+目前Cloud FPGA有通用型（OpenCL）和高性能型（DPDK）两种，OpenCL主要采用C语言开发，而DPDK主要使用Verilog硬件语言开发。
 
 
 ## FPGA
-**Q: Huawei Cloud FPGA使用的FPGA型号是什么?**
+**Q: Cloud FPGA使用的FPGA型号是什么?**
 
-目前Huawei Cloud FPGA使用的FGPA是Xilinx公司的Ultra Scale+系列xcvu9p-flgb2104-2-i板卡。
+目前Cloud FPGA使用的FGPA是Xilinx公司的Ultra Scale+系列xcvu9p-flgb2104-2-i板卡。
 
 
 ## FPGA Shell
