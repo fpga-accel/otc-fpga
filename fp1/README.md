@@ -1,7 +1,5 @@
 # fp1 Development Suite Description
 
-[切换到中文版](./README_CN.md)
-
 ---
 
 ## Contents
@@ -9,17 +7,25 @@
 1. [fp1 Development Suite](#sec-1)
 2. [Directory Structure](#sec-2)
 3. [Contents Description](#sec-3)
-4. [HDK Running Process](#sec-4)
-   * [4.1 License and Environment Variable Configuration](#sec-4-1)
-   * [4.2 Designing and Simulation](#sec-4-2)
-   * [4.3 User Application Compilation and Debugging](#sec-4-3)
-   * [4.4 Uploading and Registration](#sec-4-4)
-   * [4.4 Loading and Running](#sec-4-5)
+4. [FPGA Development Guide for General-Purpose Architecture](#sec_3)
+   * [4.1 Hardware Development Process](#sec_3_1)
+   * [4.2 Software Development Process](#sec_3_2)
+   * [4.3 Using an SDAccel-Based Example](#sec_3_3)
 
-</div>
+
+The dependency of the development suite on the user server is as follows:
+
+| Type                                  | Description                              |
+| ------------------------------------- | ---------------------------------------- |
+| Operating system                      | Linux centos 7.3                         |
+| Memory                                | >=37GByte                                |
+| Hard disk                             | Before installing the SDx tool >=100GByte |
+| The installation path of the SDx tool | must be installed in the /software directory |
+| license feature                       | (1) XCVU9P, (2) PartialReconfiguration, (3) Simulation 1735 Version 2, (4) xcvu9p_bitgen, (5) ap_opencl |
+| SDx tool version                      | 2017.4.op                                |
 
 <a id="sec-1" name="sec-1"></a>
-## fp1 Development Suite
+# 1 fp1 Development Suite
 
 ---
 
@@ -29,7 +35,7 @@
 
 <a id="sec-2" name="sec-2"></a>
 
-## Directory Structure
+# 2 Directory Structure
 
 ---
 
@@ -39,15 +45,13 @@
   - [tools/](#sec-3-3)
   - [docs/](#sec-3-4)
   - [release_notes.md](#sec-3-5)
-  - [fpga_tool_setup.sh](#sec-3-6)
-  - [fpga_tool_unistall.sh](#sec-3-7)
   - [setup.cfg](#sec-3-8)
   - [setup.sh](#sec-3-9)
-  - README.md
+  - [FAQs.md](#sec-3-10)
 
 <a id="sec-3" name="sec-3"></a>
 
-## Contents Description
+# 3 Contents Description
 
 ---
 
@@ -55,9 +59,9 @@
 
 - hardware
 
-  This directory stores fp1 hardware development suite, including Vivado and SDAccel tools. Vivado supports VHDL and Verilog for development, while SDAccel supports C, C++, and OpenCL for development.
+  This directory stores fp1 hardware development suite, including SDAccel tools. SDAccel supports C, C++, and OpenCL for development.
 
-  For details, see [hardware README](./fp1/hardware/README.md).
+  For details, see [hardware README](./hardware/README.md).
 
 <a id="sec-3-2" name="sec-3-2"></a>
 
@@ -65,13 +69,13 @@
 
   This directory stores fp1 software development suite, including example running environment, drivers, tools, and applications.
 
-  For details, see [software README](./fp1/software/README.md).
+  For details, see [software README](./software/README.md).
 
 <a id="sec-3-3" name="sec-3-3"></a>
 
 - tools
 
-  This directory stores tools for fp1 FPGA development. Currently, only the FPGA image loading tool is available.
+  This directory stores tools for fp1 FPGA development.
 
 <a id="sec-3-4" name="sec-3-4"></a>
 
@@ -81,27 +85,15 @@
 
 <a id="sec-3-5" name="sec-3-5"></a>
 
-- release_notes.md
+- release_note.md
 
   This document provides fp1 operation instructions, including project building, user simulation, and application tests.
-
-<a id="sec-3-6" name="sec-3-6"></a>
-
-- fpga_tool_setup.sh
-
-  This script is used to configure and install the FPGA image loading tool. Run this script before using the FPGA image loading tool.
-
-<a id="sec-3-7" name="sec-3-7"></a>
-
-- fpga_tool_unistall.sh
-
-  This script is used to uninstall the FPGA image loading tool.
 
 <a id="sec-3-8" name="sec-3-8"></a>
 
 - setup.cfg
 
-  This user configuration file stores license configurations and Vivado version configurations.
+  This user configuration file stores license configurations and SDx version configurations.
 
 <a id="sec-3-9" name="sec-3-9"></a>
 
@@ -109,122 +101,57 @@
 
   This script is used to configure environment variables. Run this script before using the development suite.
 
-<a id="sec-4" name="sec-4"></a>
+<a id="sec-3-10" name="sec-3-10"></a>
 
-## HDK Running Process
+- FAQs
 
----
+  This document describes the frequently asked questions (FAQs) and high-risk operations.
 
-The HDK running process is classified into Vivado-based process and SDAccel-based process.
-Vivado and SDAccel tools share the same method to configure the license and environment variables, but use different paths and examples for development and simulation.
+  <a name="sec_3"></a>
 
-The following are common steps for Vivado and SDAccel development:
+# 4 FPGA Development Guide for General-Purpose Architecture
+When a general-purpose architecture is used, the FPGA development is divided to three scenarios: hardware development, software development, and example using. During hardware development, you can generate and register an FPGA image by using the SDAccel tools. During software development, you can develop applications based on the existing FPGA image. By using examples, you can quickly master the FPGA development process under the current server architecture.
 
-1. Configuring the license and environmental variables.
-2. Designing and simulating.
-3. Designing and debugging applications.
-4. Loading and running.
++ [4.1 Hardware Development Process](#sec_3_1)
++ [4.2 Software Development Process](#sec_3_2)
++ [4.3 Using an SDAccel-Based Example](#sec_3_3)
 
-<a id="sec-4-1" name="sec-4-1"></a>
+<a name="sec_4_1"></a>
+## 4.1 Hardware Development Process
 
-### License and Environment Variable Configuration
+> If the kernel compilation has been implemented offline , and the corresponding xclbin file generation is done, please refer to the link as [SDAccel-based offline development online usage process description](./docs/SDAccel-based_offline_development_online_use_process_guidance.md).
 
-- Open the **setup.cfg** file:
+When a general-purpose architecture is used, the hardware development is based on the SDAccel tools. This development process guides users to create, compile, and simulate a project, generate an .xclbin file, and register an FPGA image (AEI, Accelerated Engine Image). After the hardware development, if you need to develop your own applications based on the registered FPGA image, see section [4.2](#sec_3_2).
 
-```bash
-  $ vim setup.cfg
-```
+![](./docs/media/SDAccel_hdk_root.jpg)
 
-- Configure **FPGA_DEVELOP_MODE**:
+<a name="sec_3_1_1"></a>
+### 4.1.1 Generating an .xclbin File
+For details about how to develop an .xclbin file based on the SDAccel, see [Implementation_Process_of_SDAccel_based_Hardware_Development](./docs/Implementation_Process_of_SDAccel_based_Hardware_Development.md).
 
-  If SDAccel is used, set **FPGA_DEVELOP_MODE="sdx"**.
-  If Vivado is used, set **FPGA_DEVELOP_MODE="vivado"**.
-  **FPGA_DEVELOP_MODE="sdx"** is the default configuration.
+<a name="sec_3_1_2"></a>
+### 4.1.2 Registering an FPGA Image
+Before registering an FPGA image, if you have not installed this tool yet, please install the image management tool fisclient. After the installation, you can use AEI_Register.sh to register an FPGA image with the image management module. For details about how to register an FPGA image, see [Registering an FPGA Image](./docs/Register_an_FPGA_image_for_an_OpenCL_project.md). After the registration, an ID is assigned to the FPGA image. Please record this ID, because it can be used to query the registration status, and load, delete, and associate the image.
 
-- Configure the software license:
+<a name="sec_3_2"></a>
+## 4.2 Software Development Process
 
-```bash
-  XILINX_LIC_SETUP="2100@100.125.4.143:2100@100.125.4.144"
-```
+After hardware development and FPGA image registration, you can develop FPGA user applications by referring to this section.
 
-- Configure **VIVADO_VER_REQ**:
+<a name="sec_3_2_1"></a>
+### 4.2.1 Compiling and Debugging User Applications
+The general-purpose architecture development mode uses the Xilinx SDAccel architecture to exchange data between the FPGA and the processors. For details about how to compile and debug user applications, see [SDAccel-Based User Applications Development Description](./software/app/sdaccel_app/README.md).
+If you need to modify the HAL, see the [SDAccel Mode HAL Development Description](./software/userspace/sdaccel/README.md).
 
-  If SDAccel is used, set **VIVADO_VER_REQ="2017.1"**.
-  If Vivado is used, set **VIVADO_VER_REQ="2017.2"**.
-  **VIVADO_VER_REQ="2017.1"** is the default configuration.
+<a name="sec_3_2_2"></a>
+### 4.2.2 Running User Applications
 
-- Set the software installation path
+After the FPGA image loading and application compilation, you can go to the `huaweicloud-fpga/fp1/software/app/sdaccel_app`directory to run user applications.
 
-  The software installation path is stored in the `/software` folder by default. 
-  If you do not install the relevant software under this folder, you need to modify the `SOFT_INSTALL_DIR` parameter in the `setup.cfg` file for the user to install the tool path.
+<a name="sec_3_3"></a>
+## 4.3 SDAccel-Based Example
+When a general-purpose architecture is used, the Huawei FAC services provide three examples.  Example 1 is an example of matrix multiplication using C to implement the logic algorithm. Example 2 is an example of vector addition using OpenCL C to implement the logic algorithm.Example 3 is an example of vector addition using RTL to implement the logic function. The following figure shows the SDAccel-based example operation process.
 
-  `SOFT_INSTALL_DIR="/software"`
+![](./docs/media/SDAccel_example.jpg)
 
-- Configure environment variables:
-
-```bash
-  $ source setup.sh
-```
-
-**Note**
-
-The fislcint tool must be installed before executing the `setup.sh` script。
-
-Each time the `source setup.sh` command is executed, the HDK executes the following steps:
-
-1. Check whether the license files of all tools are configured and whether the tools are installed. (By default, the tools and license are not installed.)
-2. Notify users whether the tools are installed.
-3. Print version information about all installed tools.
-
-**Note**
-
-If the project is installed for the first time or the version is upgraded, in addition to the preceding three steps, the HDK executes the following steps:
-
-1. Precompile the VCSMX simulation library (if the VCSMX tool exists).
-2. Precompile the QuestaSim simulation library (if the QuestaSim tool exists).
-3. Use the Vivado tool to generate an IP and a DDR simulation model，OpenCL calls SDX tools and DSA and other compressed packages.
-4. Download the .dcp file and compressed package from the OBS bucket.OpenCL downloads DSA files and archives in OBS buckets.This process takes about three to five minutes.
-
-**Note**
-
-The following conditions need to be re-executed source setup.sh command:
-
-1. When you reopen a terminal;
-2. When the network is disconnected and reconnected to the platform;
-3. When modifying the setup.sh script and making changes effective immediately.
-
-<a id="sec-4-2" name="sec-4-2"></a>
-
-### Designing and Simulation
-
-The HDK supports designing and simulation using `Vivado` and `SDx` tools. For details, see **Simulating User Logic** in the [hardware Description](./hardware/README.md).
-
-<a id="sec-4-3" name="sec-4-3"></a>
-
-### User Application Compilation and Debugging
-
-If different development modes are used, this step is slightly different.
-
-- Vivado Development Mode
-
-Vivado development mode uses the DPDK architecture to exchange data between the FPGA and processors. For details about how to compile and debug user applications, see [DPDK-based User Applications Development Description](./software/app/dpdk_app/README.md).
-If you need to modify the driver, see [DPDK-based Driver Development Description](./software/userspace/dpdk_src/README.md).
-
-- SDx Development Mode
-
-SDx development mode uses the Xilinx SDAccel architecture to exchange data between the FPGA and processors. For details about how to compile and debug user applications, see [Using an SDAccel-based Example](./docs/Using_an_SDAccel_based_Example.md).
-
-<a id="sec-4-4" name="sec-4-4"></a>
-
-### Uploading and Registration
-
-You can upload a .bin file and generate the registration ID based on the APIs and the uploading and registration tools provided by the FAC services. For details, see sections "AEI_Register.sh Operation Instructions" in [usr_prj0 Compilation Guide](./hardware/vivado_design/user/usr_prj0/prj/README.md).
-
-<a id="sec-4-5" name="sec-4-5"></a>
-
-### Loading and Running
-
-You can load the .bin file based on the APIs provided by the FAC services and the registration ID generated during the .bin file upload. For details, see related documents.
-
-Running the .bin file is similar to **compiling and debugging user applications**. For details, see section [Compiling and Debugging User Applications](#sec-4-3) in this document.
-
+For details, see [Using an SDAccel-Based Example](./docs/Using_an_SDAccel_based_Example.md).

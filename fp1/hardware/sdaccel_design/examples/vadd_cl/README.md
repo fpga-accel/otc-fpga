@@ -1,8 +1,7 @@
 # About This Example
 
-[切换到中文版](./README_CN.md)
 
-This document describes the CL standardization of the vadd_rtl vector addition.
+This document describes the CL standardization of the vadd_rtl vector plus.
 
 # Directory Structure
 [vadd_cl](#vadd_cl_dir)/
@@ -14,23 +13,24 @@ This document describes the CL standardization of the vadd_rtl vector addition.
 - src
 - scripts
 
-# File and Folder Description
+# File and Folder Descriptions
 - prj
 
   - prj/bin
 
-This directory stores the executable files and target files, such as xclbin, generated after compilation.
+  This directory stores the executable files and target files, such as xclbin, generated after compilation.
 
-	- prj/log
+  - prj/log
 
-This directory stores logs generated after the execution of target files.
+  This directory stores logs generated after the execution of target files.
+
 - sim
 
 This is the user simulation directory.
 
 - src
 
-This directory stores host source code and kernel source code.
+This directory stores the host source code and kernel source code.
 
 
 - scripts

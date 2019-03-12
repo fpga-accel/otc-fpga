@@ -1,6 +1,6 @@
 # Description
 
-[切换到中文版](./README_CN.md)
+
 
 This directory stores `project directory templates`, aiming to standardizing and simplifying project building. The templates can also be used as a reference for users to build their own projects.
 

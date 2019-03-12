@@ -1,7 +1,7 @@
 
 # Directory Structure
 
-[切换到中文版](./README_CN.md)
+
 
 * [sdaccel_design/user](#sdaccel_design/user)/  
   - create_prj.sh
@@ -30,6 +30,9 @@
 # Creating a User Project
   There are two methods for creating a user project:
   * Copy an example project. Modify parameters and add functional modules as required.
+
   * Create a project and add user-developed code to the compilation environment as required.
-      The first method allows users to quickly implement a project, and the second requires users to compile code.
+
+
+  The first method allows users to quickly implement a project, and the second requires users to compile code.
 

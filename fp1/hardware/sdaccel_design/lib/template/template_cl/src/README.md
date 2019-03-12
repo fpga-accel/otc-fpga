@@ -1,6 +1,6 @@
 # Operation Instructions
 
-[切换到中文版](./README_CN.md)
+
 
 * Makefile in this directory is used to compile the host program and kernel program. Users can modify Makefile as required.
 * If Makefile is used, manually modify the variables.

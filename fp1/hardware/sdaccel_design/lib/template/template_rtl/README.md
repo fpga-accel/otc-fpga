@@ -1,6 +1,6 @@
 # About This Example
 
-[切换到中文版](./README_CN.md)
+
 
 This document describes the RTL standardization of the vadd_rtl vector addition.
 

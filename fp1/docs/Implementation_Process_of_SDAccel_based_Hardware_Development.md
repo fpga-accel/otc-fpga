@@ -1,9 +1,7 @@
 Implementation Process of SDAccel-Based Hardware Development
 =======================
-[切换到中文版](./Implementation_Process_of_SDAccel_based_Hardware_Development_cn.md)
 
 **Notes**
-
 After the SDX tool is installed, you need to delete the corresponding installation package to free hard disk space.
 
 Contents
@@ -15,13 +13,14 @@ Contents
 
 [Creating a User Project](#sec-3)
 
-[SDAccel Development](#sec-4)
+[Implementing SDAccel-Based Development](#sec-4)
 
-[SDAccel Simulation](#sec-5)
+[Implementing SDAccel-Based Simulation](#sec-5)
 
 [Configuring a Project](#sec-6)
 
 [Version Compilation](#sec-7)
+
 
 <a id="sec-1" name="sec-1"></a>
 
@@ -86,12 +85,16 @@ To use SDAccel as a development tool, set the parameter as follows:
 
 `FPGA_DEVELOP_MODE="sdx"`
 
+**Note**
+The default development tool is sdx.
 
 #### Step 2 Configure the license file of EDA.
 
 Set `XILINX_LIC_SETUP` in the setup.cfg file to the IP address of the license server.
 
-`XILINX_LIC_SETUP="2100@100.125.4.143:2100@100.125.4.144"`
+```bash
+XILINX_LIC_SETUP="2100@fpga-lic.eu-de.otc.t-systems.com"
+```
 
 
 #### Step 3 Configure the version of EDA.
@@ -99,35 +102,37 @@ Set `XILINX_LIC_SETUP` in the setup.cfg file to the IP address of the license se
 Set `VIVADO_VER_REQ` in the `setup.cfg` file to the version of the selected tool.
 
 To use SDAccel as a development tool, set the parameter of `VIVADO_VER_REQ` as follows:
-
-`VIVADO_VER_REQ="2017.1"`
+```bash
+VIVADO_VER_REQ="2017.4.op"
+```
 
 #### Step 4 Set the software installation path
 
 The software installation path is stored in the `/software` folder by default. 
 If you do not install the relevant software under this folder, you need to modify the `SOFT_INSTALL_DIR` parameter in the `setup.cfg` file for the user to install the tool path.
 
-`SOFT_INSTALL_DIR="/software"`
-
+```bash
+SOFT_INSTALL_DIR="/software"
+```
 
 **Notes**
+The default development tool version is 2017.4.op.
 
 Only user **root** has the right to use the Xilinx license file.
 
-#### Step 5 Complete the development environment configuration.
+#### Step 4 Complete the development environment configuration.
 
 Run the `setup.sh` script to configure the hardware development environment.
 
-
-`cd otc-fpga/fp1`  
-`export HW_FPGA_DIR=$(pwd)`  
-`source $HW_FPGA_DIR/setup.sh`
-
+```bash
+cd otc-fpga/fp1  
+export HW_FPGA_DIR=$(pwd) 
+source $HW_FPGA_DIR/setup.sh
+```
 
 **Note**
 You can copy all the files of SDAccel to any directory on a VM. The following sections use the default directory as an example.
-
-The fislcint tool must be installed before executing the `setup.sh` script。
+The fisclient tool must be installed before executing the `setup.sh` script。
 
 <a id="sec-3" name="sec-3"></a>
 Creating a User Project
@@ -135,13 +140,13 @@ Creating a User Project
 
 By default, user projects are stored in the `$HW_FPGA_DIR/hardware/sdacel_design/user` directory. Run the `create_prj.sh` script to create a project.
 
-
-`cd $HW_FPGA_DIR/hardware/sdaccel_design/user`  
-`sh create_prj.sh <usr_prj_name> <kernel_mode>`
-
+```bash
+cd $HW_FPGA_DIR/hardware/sdaccel_design/user 
+sh create_prj.sh <usr_prj_name> <kernel_mode>
+```
 
 **Note**
-<usr_prj_name> is the user project name and is specified when users create a project. <kernel_mode> is the user project type, and users can select `temp_cl, temp_c, or temp_rtl`. For details, see `$HW_FPGA_DIR/hardware/sdacel_design/user/README.md`.
+usr_prj_name is the user project name and is specified when users create a project. kernel_mode is the user project type, and users can select `temp_cl, temp_c, or temp_rtl`. For details, see `$HW_FPGA_DIR/hardware/sdacel_design/user/README.md`.
 
 <a id="sec-4" name="sec-4"></a>
 Implementing SDAccel-Based Development
@@ -163,27 +168,32 @@ SDAccel supports the cpu-emulation and hw-emulation simulation modes.
 
 #### Step 1 Develop host and kernel code.
 
-`cd $HW_FPGA_DIR/hardware/sdaccel_design/user/<usr_prj_name>/src`
+```bash
+cd $HW_FPGA_DIR/hardware/sdaccel_design/user/<usr_prj_name>/src
+```
 
 The code must be stored in the **src** directory.
 
 #### Step 2 Configure compilation scripts.
 
-`cd $HW_FPGA_DIR/hardware/sdaccel_design/user/<usr_prj_name>/src`
-
+```bash
+cd $HW_FPGA_DIR/hardware/sdaccel_design/user/<usr_prj_name>/src
+```
 Configure host and kernel names in the Makefile file.
 
 #### Step 3 Implement simulation compilation.
 
-`cd $HW_FPGA_DIR/hardware/sdaccel_design/user/<usr_prj_name>/scripts`  
-`sh compile.sh <emulation_mode>`
+```bash
+cd $HW_FPGA_DIR/hardware/sdaccel_design/user/<usr_prj_name>/scripts  
+sh compile.sh <emulation_mode>
+```
 
 #### Step 4 Implement the simulation.
 
-
-`cd $HW_FPGA_DIR/hardware/sdaccel_design/user/<usr_prj_name>/scripts`  
-`sh run.sh emu ../prj/bin/<example_host> ../prj/bin/<xclbin>`
-
+```bash
+cd $HW_FPGA_DIR/hardware/sdaccel_design/user/<usr_prj_name>/scripts  
+sh run.sh emu ../prj/bin/<example_host> ../prj/bin/<xclbin>
+```
 
 **Note**
 For details about how to implement the simulation, see `HW_FPGA_DIR/hardware/sdaccel_design/user/<usr_prj_name>/README.md`.
@@ -206,12 +216,18 @@ Version Compilation
 
 Run the `compile.sh` script to compile, link, and generate the host program, and to compile the kernel, implement synthesis, placing, and routing, and generate the target file.
 
-
-`cd $HW_FPGA_DIR/hardware/sdaccel_design/user/<usr_prj_name>/scripts/`  
-`sh compile.sh hw`
-
+```bash
+cd $HW_FPGA_DIR/hardware/sdaccel_design/user/<usr_prj_name>/scripts/ 
+sh compile.sh hw
+```
 
 **Note**
 For details, see `HW_FPGA_DIR/hardware/sdaccel_design/user/<usr_prj_name>/README.md`.  
 
 **Each compilation clears the previously compiled contents. Back up the compiled files before a new compilation.**
+
+
+
+
+
+

@@ -1,6 +1,6 @@
 # Descriptions
 
-[切换到中文版](./README_CN.md)
+
 
 * vadd_cl
 ---------------------

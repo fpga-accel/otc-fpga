@@ -1,10 +1,8 @@
 Using an SDAccel-Based Example
 ========================
 
-[切换到中文版](./Using_an_SDAccel_based_Example_cn.md)
 
 **Notes**
-
 After the SDX tool is installed, you need to delete the corresponding installation package to free hard disk space.
 
 Functions
@@ -31,23 +29,17 @@ The SDAccel HDK platform serves to complete the compilation and simulation of th
 
 2.  Configure the license file of EDA.
 
-  Open the `setup.cfg` file in `otc-fpga/fp1/` and set **XILINX_LIC_SETUP** to the IP address of the license server. Set **FPGA_DEVELOP_MODE="sdx"** and **VIVADO_VER_REQ="2017.1"**.
+  Open the `setup.cfg` file in `otc-fpga/fp1/` and set **XILINX_LIC_SETUP** to the IP address of the license server. Set **FPGA_DEVELOP_MODE="sdx"** and **VIVADO_VER_REQ="2017.4.op"**.
 
-  	`FPGA_DEVELOP_MODE="sdx"`  
-  	`VIVADO_VER_REQ="2017.1"`
-    `XILINX_LIC_SETUP="2100@100.125.4.143:2100@100.125.4.144"`
-    
-3.  Set the software installation path.
+  	FPGA_DEVELOP_MODE="sdx"  
+  	VIVADO_VER_REQ="2017.4.op"
+  	XILINX_LIC_SETUP="2100@fpga-lic.eu-de.otc.t-systems.com"
 
-  The software installation path is stored in the `/software` folder by default. If you do not install the relevant software under this folder, you need to modify the `SOFT_INSTALL_DIR` parameter in the `setup.cfg` file for the user to install the tool path.    
 
-  	`SOFT_INSTALL_DIR="/sofware"`
-  	
 ##### Note
-
   Only user *root* has the right to use the Xilinx license file.
 
-4. Configure the development environment.
+3. Configure the development environment.
 
   Run the **otc-fpga/fp1/setup.sh** script to configure the hardware development environment.
 
@@ -57,7 +49,7 @@ The SDAccel HDK platform serves to complete the compilation and simulation of th
 ##### Note
   For details, see the configuration environment part of the README file in the **otc-fpga/fp1/** directory.
 
-5. Configure the example.
+4. Compile the example.
    ```
    cd $HW_FPGA_DIR/hardware/sdaccel_design/examples/mmult_hls/scripts
    sh compile.sh compile_mode
@@ -72,16 +64,16 @@ The SDAccel HDK platform serves to complete the compilation and simulation of th
    Users can select a compilation mode as required.  
    For details, see [Examples](../hardware/sdaccel_design/examples/mmult_hls/README.md).
 
-6. Simulate the example.
+5. Simulate the example.
 
-   cpu_em Simulate:
+cpu_em Simulate:
 
    ```
     cd $HW_FPGA_DIR/hardware/sdaccel_design/examples/mmult_hls/scripts
     sh run.sh emu ../prj/bin/mmult ../prj/bin/bin_mmult_cpu_emu.xclbin
    ```
 
-   hw_em Simulate:
+hw_em Simulate:
 
    ```
     cd $HW_FPGA_DIR/hardware/sdaccel_design/examples/mmult_hls/scripts
@@ -90,24 +82,32 @@ The SDAccel HDK platform serves to complete the compilation and simulation of th
 
 ##### Notes
 
-   *host* is the host program generated during compilation (The hardware compilation mode does not support simulation.):  
+   `emu` is compile_mode.
+
+   `../prj/bin/mmult` is the host program generated during compilation (The hardware compilation mode does not support simulation.):  
    mmult_hls example: The host program is mmult.  
    vadd_cl example: The host program is vadd.  
    vadd_rtl example: The host program is host.
 
-   *.xclbin* is the .xclbin file generated during compilation. Different compilation modes correspond to different .xclbin files.  
+   `../prj/bin/bin_mmult_hw_emu.xclbin` is the .xclbin file generated during compilation. Different compilation modes correspond to different .xclbin files.  
    If the *compile_mode* is **cpu_em**, select **bin_mmult_cpu_emu.xclbin**.  
    If the *compile_mode* is **hw_em**, select **bin_mmult_hw_emu.xclbin**.  
 
    Skip this step if the simulation test is not required.
 
-7. Perform the hardware test.
+6. Perform the hardware test.
 
-  Select the **hw** mode as shown in step 4 to compile and generate an .xclbin file, register an image, load the image, and perform the hardware test on the running environment according to the SDAccel SDK process in the following sections.
-  For details about how to register an image, see [Registering an FPGA Image](./Registering an FPGA Image.md). For details about how to load the image, see [Loading an FPGA Image](../tools/fpga_tool/docs/load_an_fpga_image.md).
+   Perform step 4 to select the hw mode and generate the xclbin file.
+
+##### Note:
+  The xclbin file name needs to be adjusted based on the site requirements. 
 
 SDAccel SDK Operation Instructions
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+##### Note:
+
+Generate a .xclbin file, [AEI register](./Register_an_FPGA_image_for_an_OpenCL_project.md) and compile the SDK  before using the SDK.
 
 The SDAccel SDK platform is used to test hardware. Compile and run the host program in the execution environment. This section uses mmult_hls as an example to describe the operations.
 
@@ -154,7 +154,10 @@ The SDAccel SDK platform is used to test hardware. Compile and run the host prog
   Run the **run.sh** command to load and test hardware. The detailed procedure is as follows:
 
   	cd $SW_FPGA_DIR/software/app/sdaccel_app/mmult_hls
-  	sh run.sh mmult $HW_FPGA_DIR/hardware/sdaccel_design/examples/mmult_hls/prj/bin/bin_mmult_hw.xclbin
+  	sh run.sh mmult $SW_FPGA_DIR/hardware/sdaccel_design/examples/mmult_hls/prj/bin/sdk_aeiid.xclbin 0
+
+The 0 at the end of the above run.sh script indicates the slot number, which is obtained when the user requests the environment. 
+For example, if a user applies for a virtual machine environment with 4 FPGA accelerator cards, the slot numbers are 0, 1, 2, and 3.
 
 ##### Note
 
