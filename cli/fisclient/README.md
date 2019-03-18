@@ -1,13 +1,17 @@
 # fisclient #
+[切换到中文版](README_CN.md)<br/><br/>
+**fisclient** is a command-line client for FIS (FPGA Image Service) that brings the command set for FPGA image management together in a single shell.
 
 - [1 Requirements on the Operating Environment](#1-requirements-on-the-operating-environment)
 - [2 Installing fisclient](#2-installing-fisclient)
 - [3 Configuring fisclient](#3-configuring-fisclient)
 - [4 Introduction](#4-introduction)
   - [4.1 fis Command](#41-fis-command)
-  - [4.2 Querying FPGA Images](#42-querying-fpga-images)
-  - [4.3 Deleting an FPGA Image](#43-deleting-an-fpga-image)
-  - [4.4 Associating and Disassociating FPGA Images, and Querying Associations](#44-associating-and-disassociating-fpga-images-and-querying-associations)
+  - [4.2 Creating an FPGA Image](#42-creating-an-fpga-image)
+  - [4.3 Querying FPGA Images](#43-querying-fpga-images)
+  - [4.4 Getting an Log File](#44-getting-an-log-file)
+  - [4.5 Deleting an FPGA Image](#45-deleting-an-fpga-image)
+  - [4.6 Associating and Disassociating FPGA Images, and Querying Associations](#46-associating-and-disassociating-fpga-images-and-querying-associations)
 - [5 fis Command Description](#5-fis-command-description)
   - [5.1 Viewing Help Information](#51-viewing-help-information)
   - [5.2 Deletion Subcommand](#52-deletion-subcommand)
@@ -15,42 +19,49 @@
   - [5.4 Association Subcommand](#54-association-subcommand)
   - [5.5 Disassociation Subcommand](#55-disassociation-subcommand)
   - [5.6 Association Query Subcommand](#56-association-query-subcommand)
-- [A Acronyms and Abbreviations](#a-acronyms-and-abbreviations)
+  - [5.7 Get Log Subcommand](#57-get-log-subcommand)
+
 
 <a name="requirements-on-the-operating-environment"></a>
 # 1 Requirements on the Operating Environment #
 **fisclient** is developed and tested in the following environments:
 
-- CentOS 7.3
+- FPGA Elastic Cloud Server
+- CentOS 7.3 64 bit
 - Python 2.7
 
 For other environments, availability is not ensured.
 
 <a name="installation"></a>
 # 2 Installing fisclient #
-- Step 1. Log in to the elastic cloud server (ECS) as **root**.
+- Step 1. Log in to the ECS as **root**.
 
 - Step 2. Go to the **cli/fisclient** directory of the **FPGA Development Suite**.
 
 - Step 3. Run the `bash install.sh` command to install **fisclient**.
 
+> After installing fisclient, please configure and run fisclient as **root**.
+
 <a name="configuration"></a>
 # 3 Configuring fisclient #
-Run the `fis configure` command to configure **fisclient**.<br/>
+Run the `fis configure` command to configure **fisclient**.
+- Please configure fisclient as **root**.
+- Ensure that the metadata can be accessed from your ECS.
+- **fisclient** will configure private DNS for your ECS.
 
 Set the parameters listed in the following table.
 
 | Parameter | Description |
 | --------- | ----------- |
-| **Access Key** | Access Key ID (AK) |
-| **Secret Key** | Secret Access Key (SK) |
-| **Bucket Name** | Bucket of object storage service (OBS), for storing the FPGA images to be registered |
+| **Access Key** | AK (Access Key ID) |
+| **Secret Key** | SK (Secret Access Key) |
+| **Bucket Name** | OBS Bucket for storing the DCP and LOG files |
 
 > **fisclient** automatically saves the last valid parameter configuration. You can enter new parameter configurations or press **Enter** to use the previous configuration.<br/>
 > After the configuration is complete, you can run the `fis configure --dump` command to view the current configuration.
 
 ### Step 1. Configure key parameters ###
-Before configuring key parameters, create and obtain an access key by following instructions in [Creating Access Keys](https://docs.otc.t-systems.com/en-us/usermanual/obs/en-us_topic_0045853769.html).
+Before configuring key parameters, create and obtain an access key by following instructions in [Creating Access Keys](https://support.huaweicloud.com/en-us/clientogw-obs/en-us_topic_0045853769.html).
 
 <pre>
 Access key and Secret key are your identifiers for FIS and OBS.
@@ -61,14 +72,14 @@ Secret Key []: a0vet3Eh********************cIr4meJzYSMe
 Enter the **Access Key ID** and **Secret Access Key** when prompted.
 
 ### Step 2. Configure Bucket Name ###
-**Bucket Name** indicates the OBS bucket that stores the FPGA images to be registered.
+**Bucket Name** indicates the OBS bucket that stores the DCP and LOG files.
 
 > If you have available buckets in the current region, fisclient will list them all. Select one of them.
 
 #### Example 1. Create a new OBS bucket ####
 
 <pre>
-Choose or Create a Bucket for storing the FPGA images to be registered.
+Choose or Create a Bucket for storing the DCP and LOG files.
 Available Bucket(s):
   (1) hello-fpga1
 Bucket Name []: hello-fpga2
@@ -89,13 +100,13 @@ If your do not have any available buckets in the current region, or you just wan
 #### Example 2. Choose an existing OBS bucket ####
 
 <pre>
-Choose or Create a Bucket for storing the FPGA images to be registered.
+Choose or Create a Bucket for storing the DCP and LOG files.
 Available Bucket(s):
   (1) hello-fpga1
   (2) hello-fpga2
 Bucket Name []: 2
 </pre>
-If you want to use an existing OBS bucket, enter the serial number of the OBS bucket when prompted. For example, if you have two available OBS buckets (**hello-fpga1** and **hello-fpga2**) in the current region and want to use **hello-fpga2** to store the FPGA images to be registered, enter the serial number corresponding to **hello-fpga2**, that is, **2**.
+If you want to use an existing OBS bucket, enter the serial number of the OBS bucket when prompted. For example, if you have two available OBS buckets (**hello-fpga1** and **hello-fpga2**) in the current region and want to use **hello-fpga2** to store the DCP and LOG files, enter the serial number corresponding to **hello-fpga2**, that is, **2**.
 
 > If the name of the bucket to be selected or created conflicts with that in the **Available Bucket(s)** list, add an exclamation mark (!) before the bucket name. That is, use **!mybucket** to indicate that the name of the bucket to be selected or created is **mybucket**.
 
@@ -124,12 +135,41 @@ The format of a fis command is `fis <subcommand> <option>`.
 
 For details about how to use the fis command, see [fis command Description](#fis-command-description).
 
-## 4.2 Querying FPGA Images ##
-After registering an FPGA image, you can use the fis query subcommand to query information about FPGA images owned by youself. After the **status** of an FPGA image changes to **active**, you can use the corresponding FPGA image ID to load, delete, and associate the FPGA image.<br/>
+## 4.2 Creating an FPGA Image ##
+
+- Step 1. Run the **AEI_Register.sh** script in the project to create an FPGA image and get an FPGA image ID.
+
+> Quotas: A single tenant can create at most **one** FPGA image at a time. When a tenant attempts to create multiple FPGA images at the same time, the creation will fail.<br/>
+> Asynchronous creation: Creating an FPGA image is an asynchronous process. Successful execution of **step 1** does not mean that the FPGA image was created successfully. You also needs to execute **step 2** until the status of the FPGA image is **active**, indicating that the FPGA image was created successfully.
+
+- Step 2. [Query](#43-querying-fpga-images) the creation progress. The state of the FPGA image changes during the creation. When the state is **active** or **error**, the creation is complete.
+
+> [root@ ~]# fis fpga-image-list --fpga-image-id &lt;FPGA image ID&gt;
+
+- Step 3. When the creation is complete, [getting the corresponding log file](#44-getting-an-log-file).
+
+> [root@ ~]# fis get-log-file --fpga-image-id &lt;FPGA image ID&gt;
+
+## 4.3 Querying FPGA Images ##
+After creating an FPGA image, you can use the fis query subcommand to query information about FPGA images owned by youself.<br/>
 
 > With the fis query subcommand, you can only query information about **FPGA images owned by youself**. For purchased and shared FPGA images, you should use the **fis association query subcommand**. For example, you can refer to [Querying the Shared FPGA Image](#querying-the-shared-fpga-image) to learn how to query the shared FPGA images.
 
 The fis query subcommand displays FPGA image information in a table, and also supports pagination query. For more details, see [Query Subcommand](#query-subcommand).
+
+### FPGA Image Status ###
+The FPGA image has the following six states:
+
+| status | Description |
+| ------- | ----------- |
+| **initialling** | Create initialization |
+| **scheduling** | Waiting for schedule creation |
+| **creating** | Creating in progress |
+| **active** | Available |
+| **deleting** | Deleting in progress |
+| **error** | Operation error |
+
+After the **status** of an FPGA image changes to **active**, you can use the corresponding FPGA image ID to load, delete, and associate the FPGA image.
 
 ### Example ###
 Run the following command to query FPGA images:
@@ -143,12 +183,27 @@ Success: 200 OK
 +----------------------------------+---------+--------+-----------+------+---------------------+-------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
 </pre>
 - The ID of the FPGA image is **000000\*\*\*\*\*\*08b4015e3224afe203c3**.
-- The state of the FPGA image is **active**, indicating that image has been registered successfully.
+- The state of the FPGA image is **active**, indicating that image has been created successfully.
 
 Therefore, you can use the ID of the FPGA image to load, delete, or associate the FPGA image.
 
-## 4.3 Deleting an FPGA Image ##
-An FPGA image can be deleted only by its owner. If a registered FPGA image is no longer used and you want to delete the FPGA image record from the FPGA image management module, you can run a fis deletion subcommand to delete it. In addition, if the **status** of an FPGA image is **error**, you can also use the fis deletion subcommand to delete the FPGA image record. If an FPGA image has been associated with an ECS image, the FPGA image will be **protected** (the value of **protected** is **True**) and cannot be deleted. For more details, see [Deletion Subcommand](#deletion-subcommand).
+## 4.4 Getting an Log File ##
+After the FPGA image is created, you can use the fis get log subcommand to download the corresponding log file. The log file will be saved to the current directory and named in the format of **{FPGA Image ID}_log.tar**.  For more details, see [Get Log Subcommand](#get-log-subcommand). 
+
+### Example ###
+Download the log file of the FPGA image whose ID is **0086137b\*\*\*\*\*\*\*\*016535d03b210005**.
+<pre>
+[root@ ~]# fis get-log-file --fpga-image-id 0086137b********016535d03b210005
+Log directory is "obs-test-fpga:vu9p"
+Downloading Log file from OBS
+Success: 200 OK
+Download 2517 bytes using 0.078489 second(s)
+[root@ ~]# ls
+0086137b********016535d03b210005_log.tar
+</pre>
+
+## 4.5 Deleting an FPGA Image ##
+An FPGA image can be deleted only by its owner. If a created FPGA image is no longer used and you want to delete the FPGA image record from the FPGA image management module, you can run a fis deletion subcommand to delete it. In addition, if the **status** of an FPGA image is **error**, you can also use the fis deletion subcommand to delete the FPGA image record. If an FPGA image has been associated with an ECS image, the FPGA image will be **protected** (the value of **protected** is **True**) and cannot be deleted. For more details, see [Deletion Subcommand](#deletion-subcommand).
 
 ### Confirming the Deletion ###
 fisclient provides the deletion confirmation function. You need to enter **yes** or **no** to decide whether to perform the deletion.
@@ -173,10 +228,10 @@ The output of an FPGA image query operation is as follows:
 | id                               | name     | status | protected | size | createdAt           | description | metadata                                                                                                                                                                                                                                                                                                                                                                                  | message                    |
 +----------------------------------+----------+--------+-----------+------+---------------------+-------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------+
 | ff********5056b2015d5e13608c73c7 | OCL_001  | active | False     | 43   | 2017-09-19 02:27:31 | mmult_01    | {"manifest_format_version": "1", "pci_vendor_id": "0x19e5", "pci_device_id": "0xD512", "pci_subsystem_id": "-", "pci_subsystem_vendor_id": "-", "shell_type": "0x121", "shell_version": "0x0001", "hdk_version": "SDx 2017.1", "date": "2017/09/18_18:27:12"}                                                                                                                             |                            |
-| 4010b39c5d4********48e97411005ae | dpdk_002 | error  | False     | 45   | 2017-09-19 16:39:27 | example_02  | {"manifest_format_version": "1", "pci_vendor_id": "0x19e5", "pci_device_id": "0xD503", "pci_subsystem_id": "-", "pci_subsystem_vendor_id": "-", "dcp_hash": "ced75657********60f212a9454f6c5ae33d50f0a248e99dbef638231b26960c", "shell_type": "0x101", "shell_version": "0x0013", "dcp_file_name": "ul_pr_top_routed.dcp", "hdk_version": "Vivado 2017.2", "date": "2017/09/19_13:51:41"} | register fpga image failed |
+| 4010b39c5d4********48e97411005ae | dpdk_002 | error  | False     | 45   | 2017-09-19 16:39:27 | example_02  | {"manifest_format_version": "1", "pci_vendor_id": "0x19e5", "pci_device_id": "0xD503", "pci_subsystem_id": "-", "pci_subsystem_vendor_id": "-", "dcp_hash": "ced75657********60f212a9454f6c5ae33d50f0a248e99dbef638231b26960c", "shell_type": "0x101", "shell_version": "0x0013", "dcp_file_name": "ul_pr_top_routed.dcp", "hdk_version": "Vivado 2017.2", "date": "2017/09/19_13:51:41"} | create fpga image failed   |
 +----------------------------------+----------+--------+-----------+------+---------------------+-------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------+
 </pre>
-Perform the following commands to delete the FPGA image no longer used (ID: **ff\*\*\*\*\*\*\*\*5056b2015d5e13608c73c7**), and the FPGA image that fails to be registered (ID: **4010b39c5d4\*\*\*\*\*\*\*\*48e97411005ae**):
+Perform the following commands to delete the FPGA image no longer used (ID: **ff\*\*\*\*\*\*\*\*5056b2015d5e13608c73c7**), and the FPGA image that fails to be created (ID: **4010b39c5d4\*\*\*\*\*\*\*\*48e97411005ae**):
 
 - Delete the FPGA image no longer used.
 <pre>
@@ -193,14 +248,19 @@ Success: 204 No Content
 In these commands, **--fpga-image-id** specifies the ID of the FPGA image to be deleted, **--force** specifies a forcible deletion operation. If the command output is **Success: 204 No Content**, the fis deletion subcommand is executed successfully.<br/>
 However, the execution success of the deletion subcommand does not necessarily mean that the FPGA image is deleted successfully. You need to perform the query operation. If information about the FPGA image to be deleted is not displayed, the FPGA image has been deleted successfully.
 
-## 4.4 Associating and Disassociating FPGA Images, and Querying Associations ##
-By associating a registered FPGA image, you can share the FPGA image with other users **in the same region**. By querying associations, you can query the FPGA images provided by other users. By disassociating an FPGA image, you can stop sharing the FPGA image with other users. <br/>
-This section describes how to associate or disassociate an FPGA image, and query associations. For more details about these subcommands, see [Association Subcommand](#association-subcommand), [Disassociation Subcommand](#disassociation-subcommand) and [Association Query Subcommand](#association-query-subcommand).
+## 4.6 Associating and Disassociating FPGA Images, and Querying Associations ##
+By associating a created FPGA image, you can share the FPGA image with other users **in the same region** in the following two scenarios:
+
+- Marketing Scenario: Publishing the FPGA image in the cloud market for transaction
+- Sharing Scenario: Sharing the FPGA image with a specified user
+
+By querying associations, you can query the FPGA images provided by other users. By disassociating an FPGA image, you can stop sharing the FPGA image with other users. <br/>
+This section uses the FPGA image sharing scenario as an example to describe how to associate or disassociate an FPGA image, and query associations. For more details about these subcommands, see [Association Subcommand](#association-subcommand), [Disassociation Subcommand](#disassociation-subcommand) and [Association Query Subcommand](#association-query-subcommand).
 
 ### Sharing the FPGA Image ###
-If user A wants to share a self-owned registered FPGA image with user B, user A needs to perform the following steps. The following assumes that user A wants to share the **general-purpose architecture** FPGA image whose ID is **4010b39c5d4\*\*\*\*\*\*\*\*\*\*f2cf8070c7e** with user B.
+If user A wants to share a self-owned FPGA image with user B, user A needs to perform the following steps. The following assumes that user A wants to share the **general-purpose architecture** FPGA image whose ID is **4010b39c5d4\*\*\*\*\*\*\*\*\*\*f2cf8070c7e** with user B.
 
-- Step 1. Create a private ECS image from an **general-purpose architecture** FPGA Elastic Cloud Server. For more details, see [Creating a Private Linux Image](https://docs.otc.t-systems.com/en-us/usermanual/ims/en-us_topic_0030713180.html).
+- Step 1. Create a private ECS image from an **general-purpose architecture** FPGA Elastic Cloud Server.
 
 > FPGA image sharing is achieved through ECS private image sharing. Ensure that the personal files in the FPGA Elastic Cloud Server (for example, the **~/.fiscfg** file) have been deleted before you create a private ECS image.
 
@@ -213,17 +273,17 @@ User A needs to log in to the FPGA Elastic Cloud Server, run the fis association
 Success: 204 No Content
 </pre>
 If **Success: 204 No Content** is displayed, the association is successful.
-- Step 4. Share the created private ECS image with user B. For more details, see [Sharing Specified Images](https://docs.otc.t-systems.com/en-us/usermanual/ims/en-us_topic_0032042419.html).
+- Step 4. Share the created private ECS image with user B.
 
 > A private image will become a **shared** one after the sharing and cannot be used for association. Therefore, associate a private image before sharing it.
 
 
 ### Querying the Shared FPGA Image ###
-If user B wants to use a registered FPGA image shared by user A, user B needs to perform the following steps.
+If user B wants to use a created FPGA image shared by user A, user B needs to perform the following steps.
 
-- Step 1. Accept the ECS image shared by user A. For more details, see [Accepting the shared image](https://docs.otc.t-systems.com/en-us/usermanual/ims/en-us_topic_0032042420.html).
+- Step 1. Accept the ECS image shared by user A.
 - Step 2. Obtain the type of the FPGA image from user A. In this example, it is **general-purpose architecture**.
-- Step 3. Use the shared ECS image to create an FPGA Elastic Cloud Server with the same type as the shared FPGA image. For more details, see [Creating and Logging In to a Linux ECS](https://docs.otc.t-systems.com/en-us/usermanual/ecs/en-us_topic_0092494193.html). In this example, user B needs to create an FPGA Elastic Cloud Server of **general-purpose architecture**.
+- Step 3. Use the shared ECS image to create an FPGA Elastic Cloud Server with the same type as the shared FPGA image.
 > Ensure that the type of the created FPGA Elastic Cloud Server is the same with that of the shared FPGA image.
 
 - Step 4. Obtain the image ID from the details page of the shared ECS image. In this example, it is **404223ca-8\*\*b-4\*\*2-a\*\*e-d187\*\*\*\*61bc**.
@@ -244,7 +304,7 @@ The output shows that the ID of the FPGA image shared by user A is **4010b39c5d4
 ### Canceling the FPGA Image Sharing ###
 If user A wants to stop sharing the FPGA image with user B, user A needs to perform the following operations:
 
-- Step 1. Cancel the image sharing with user B. For more details, see [Canceling the Image Sharing](https://docs.otc.t-systems.com/en-us/usermanual/ims/en-us_topic_0032087324.html).
+- Step 1. Cancel the image sharing with user B.
 - Step 2. Disassociate the shared FPGA image from the private ECS image.
 
 User A needs to log in to the FPGA Elastic Cloud Server, run the fis disassociation subcommand to disassociate the shared FPGA image from the private ECS image.
@@ -267,16 +327,16 @@ Command-line interface to the fis API.
 positional arguments: 
   &lt;subcommand&gt; 
     configure           Invoke interactive (re)configuration tool
+    fpga-image-create   Create an FPGA image
     fpga-image-delete   Delete an FPGA image
     fpga-image-list     Query FPGA images of a tenant
-    fpga-image-register
-                        Register an FPGA image
     fpga-image-relation-create
                         Create the relation of an FPGA image and an ECS image
     fpga-image-relation-delete
                         Delete the relation of an FPGA image and an ECS image
     fpga-image-relation-list
                         Query FPGA image relations visible to a tenant
+    get-log-file        Get the log file of an FPGA image
     help                Display help about fis or one of its subcommands
 
 See "fis help COMMAND" for help on a specific command.
@@ -287,20 +347,19 @@ The format of a fis command is `fis <subcommand> <option>`.
 - **&lt;subcommand&gt;** specifies the function of the command.
 - **&lt;option&gt;** is unique to the subcommand and specifies command parameters for the subcommand.
 
-fis commands include eight subcommands.
+fis commands include the following subcommands.
 
 | Command | Description |
 | ------- | ----------- |
 | **configure** | Configuration subcommand, used to invoke interactive configuration tool. |
+| **fpga-image-create** | Creation subcommand, used to create an FPGA image. |
 | **fpga-image-delete** | Deletion subcommand, used to delete an FPGA image. |
 | **fpga-image-list** | Query subcommand, used to query FPGA images of a tenant. |
-| **fpga-image-register** | Registration subcommand, used to register an FPGA image. |
 | **fpga-image-relation-create** | Association subcommand, used to associate an FPGA image with an ECS image. |
 | **fpga-image-relation-delete** | Disassociation subcommand, used to disassociate an FPGA image from an ECS image. |
 | **fpga-image-relation-list** | Association query subcommand, used to query the associations between FPGA images and ECS images visible to a tenant. |
+| **get-log-file** | Get log subcommand，used to get the log file of an FPGA image |
 | **help** | Help subcommand, used to display the help information of the fis command or fis subcommands. |
-
-> The fis registration subcommand **fpga-image-register** is automatically invoked when you run the **AEI_Register.sh** script. You do not need to run this command to register an FPGA image.
 
 <a name="deletion-subcommand"></a>
 ## 5.2 Deletion Subcommand ##
@@ -356,15 +415,17 @@ Success: 204 No Content
 The query subcommand displays the FPGA images of a tenant in a table. The subcommand also supports pagination query.
 
 ### Format ###
-**fis fpga-image-list** **[--page** *&lt;Int&gt;***] [--size** *&lt;Int&gt;***]**
+**fis fpga-image-list [--fpga-image-id** *&lt;UUID&gt;***]** **[--page** *&lt;Int&gt;***] [--size** *&lt;Int&gt;***]**
 
 ### Parameters ###
 | Parameter | Description | Value | Remarks |
 | --------- | ----------- | ----- | ------- |
-| **--page** | Specifies the page number for pagination query. This parameter is optional. | The value of **page** is a decimal integer between [1,65535) and cannot contain +. | Specified by the user. |
-| **--size** | Specifies the size of a page for pagination query. This parameter is optional. | The value of **size** is a decimal integer between [1,100] and cannot contain +. | Specified by the user. |
+| **--fpga-image-id** | Specifies the ID of the FPGA image to be queried. This parameter is optional. | The value of **fpga-image-id** is a string of 32 characters, including lowercase letters a to f and digits 0 to 9. | - |
+| **--page** | Specifies the page number for pagination query. This parameter is optional. | The value of **page** is a decimal integer between [1,65535) and cannot contain +. | - |
+| **--size** | Specifies the size of a page for pagination query. This parameter is optional. | The value of **size** is a decimal integer between [1,100] and cannot contain +. | - |
 
-> **page** and **size** must be used together and only when both parameters are set is pagination query available.
+> **page** and **size** must be used together and only when both parameters are set is pagination query available.<br/>
+> When **fpga-image-id** is set, **page** and **size** are unavailable.
 
 ### Usage Guidelines ###
 If the command output is **Success: 200 OK**, the query subcommand is executed successfully. The response information is presented in a table with the following headers.
@@ -379,10 +440,10 @@ The following table describes the table headers.
 | --------- | ----------- |
 | **id** | Specifies the FPGA image ID. |
 | **name** | Specifies the FPGA image name. |
-| **status** | Specifies the FPGA image status. |
+| **status** | Specifies the FPGA image status.<br/>Options:<br/>initialling, scheduling, creating, active, deleting, error |
 | **protected** | Specifies whether an FPGA image is protected. |
-| **size** | Specifies the size of the FPGA image, in Megabyte (MB). |
-| **createdAt** | Specifies the time (Coordinated Universal Time (UTC)) when the FPGA image was created. |
+| **size** | Specifies the size of the FPGA image, in MB. |
+| **createdAt** | Specifies the time (UTC) when the FPGA image was created. |
 | **description** | Describes the FPGA image. |
 | **metadata** | Specifies the FPGA image metadata. |
 | **message** | Provides supplementary information of the FPGA image. |
@@ -428,7 +489,7 @@ The association subcommand is used to associate an FPGA image with an ECS image.
 | Parameter | Description | Value | Remarks |
 | --------- | ----------- | ----- | ------- |
 | **--fpga-image-id** | Specifies the ID of the FPGA image to be associated. This parameter is mandatory. | The value of **fpga-image-id** is a string of 32 characters, including lowercase letters a to f and digits 0 to 9. | You can check the ID of an FPGA image in the output of a query subcommand. |
-| **--image-id** | Specifies the ID of the ECS image to be associated. This parameter is mandatory. | **image-id** complies with image ID rules of image management service (IMS). | You can get the image ID on the details page of the IMS image. |
+| **--image-id** | Specifies the ID of the ECS image to be associated. This parameter is mandatory. | **image-id** complies with IMS image ID rules. | You can get the image ID on the details page of the IMS image. |
 
 > The ECS image to be associated must be a **private** one before the FPGA image management module performs an association. After being published to the image market or shared, a private image will become a **market** or **shared** one and cannot be associated. You need to remove the published image from the image market image or cancel the sharing before association.
 
@@ -479,7 +540,7 @@ The disassociation subcommand is used to disassociate an FPGA image from an ECS 
 | Parameter | Description | Value | Remarks |
 | --------- | ----------- | ----- | ------- |
 | **--fpga-image-id** | Specifies the ID of the FPGA image to be disassociated. This parameter is mandatory. | The value of **fpga-image-id** is a string of 32 characters, including lowercase letters a to f and digits 0 to 9. | You can check the ID of an FPGA image in the output of an association query subcommand. |
-| **--image-id** | Specifies the ID of the ECS image to be disassociated. This parameter is mandatory. | **image-id** complies with image ID rules of IMS. | You can check the ID of an image in the output of an association query subcommand. |
+| **--image-id** | Specifies the ID of the ECS image to be disassociated. This parameter is mandatory. | **image-id** complies with IMS image ID rules. | You can check the ID of an image in the output of an association query subcommand. |
 
 > The ECS image to be disassociated must be a **private** one before the FPGA image management module performs a disassociation. After being published to the image market or shared, a private image will become a **market** or **shared** one and cannot be disassociated. You need to remove the published image from the image market image or cancel the sharing before disassociation.
 
@@ -525,9 +586,9 @@ The association query subcommand lists the associations between FPGA images and 
 | Parameter | Description | Value | Remarks |
 | --------- | ----------- | ----- | ------- |
 | **--fpga-image-id** | Specifies the ID of the FPGA image whose association is to be queried. This parameter is optional. | The value of **fpga-image-id** is a string of 32 characters, including lowercase letters a to f and digits 0 to 9. | You can check the ID of an FPGA image in the output of a query subcommand. |
-| **--image-id** | Specifies the ID of the ECS image whose association is to be queried. This parameter is optional. | **image-id** complies with image ID rules of IMS. | You can get the image ID on the details page of the IMS image. |
-| **--page** | Specifies the page number for pagination query. This parameter is optional. | The value of **page** is a decimal integer between [1,65535) and cannot contain +. | Specified by the user. |
-| **--size** | Specifies the size of a page for pagination query. This parameter is optional. | The value of **size** is a decimal integer between [1,100] and cannot contain +. | Specified by the user. |
+| **--image-id** | Specifies the ID of the ECS image whose association is to be queried. This parameter is optional. | **image-id** complies with IMS image ID rules. | You can get the image ID on the details page of the IMS image. |
+| **--page** | Specifies the page number for pagination query. This parameter is optional. | The value of **page** is a decimal integer between [1,65535) and cannot contain +. | - |
+| **--size** | Specifies the size of a page for pagination query. This parameter is optional. | The value of **size** is a decimal integer between [1,100] and cannot contain +. | - |
 
 > The FPGA image relations can only be obtained if at least one of the **fpga-image-id** and **image-id** is specified, otherwise only an empty list is returned.<br/>
 > **page** and **size** must be used together and only when both parameters are set is pagination query available.<br/>
@@ -547,7 +608,7 @@ The following table describes the table headers.
 | **image_id** | Specifies the ECS image ID. |
 | **fpga_image_id** | Specifies the FPGA image ID. |
 | **name** | Specifies the FPGA image name. |
-| **status** | Specifies the FPGA image status. |
+| **status** | Specifies the FPGA image status.<br/>Options:<br/>initialling, scheduling, creating, active, deleting, error |
 | **protected** | Specifies whether an FPGA image is protected. |
 | **size** | Specifies the size of the FPGA image, in MB. |
 | **createdAt** | Specifies the time (UTC) when the FPGA image was created. |
@@ -586,16 +647,43 @@ Success: 200 OK
 +--------------------------------------+----------------------------------+----------+--------+-----------+------+---------------------+-------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
 </pre>
 
-# A Acronyms and Abbreviations #
-|||
-| --------- | ----------- |
-| **AK** | Access Key ID |
-| **ECS** | Elastic Cloud Server |
-| **FIS** | FPGA Image Service |
-| **FPGA** | Field-Programmable Gate Array |
-| **IMS** | Image Management Service |
-| **MB** | Megabyte |
-| **OBS** | Object Storage Service |
-| **SK** | Secret Access Key |
-| **UTC** | Coordinated Universal Time |
-| **UUID** | Universally Unique Identifier |
+<a name="get-log-subcommand"></a>
+## 5.7 Get Log Subcommand ##
+You can use the get log subcommand to download the log file of an FPGA image.
+
+### Format ###
+**fis get-log-file --fpga-image-id** *&lt;UUID&gt;*
+
+### Parameters ###
+| Parameter | Description | Value | Remarks |
+| --------- | ----------- | ----- | ------- |
+| **--fpga-image-id** | Specifies the ID of the FPGA image of the log file to be downloaded. This parameter is mandatory. | The value of **fpga-image-id** is a string of 32 characters, including lowercase letters a to f and digits 0 to 9. | You can check the ID of an FPGA image in the output of a query subcommand. |
+
+### Usage Guidelines ###
+If the command output is **Success: 200 OK**, the get log subcommand is executed successfully. In this case, the log file will be saved to the current directory and named in the format of **{FPGA Image ID}_log.tar**, for example **0086137b\*\*\*\*\*\*\*\*016535d03b210005_log.tar**.
+
+<br/>
+If a get log subcommand fails to be executed, the response information contains failure causes.
+
+- Example
+<pre>
+[root@ ~]# fis get-log-file --fpga-image-id 0086137b\*\*\*\*\*\*\*\*0165332ab1280031
+Log directory is "obs-test-fpga:vu9p/log"
+Downloading Log file from OBS
+Error: 404 Not Found
+The specified key does not exist., Code=NoSuchKey, RequestId=00010F4B\*\*\*\*\*\*\*\*6535EA40A1CEAELK, Function=get_log_file, Arguments=(u'obs-test-fpga', u'vu9p/log/0086137b\*\*\*\*\*\*\*\*0165332ab1280031_log.tar')
+Tips: The log file may have NOT been generated, or have been Deleted or Moved.
+</pre>
+The error information shows that the log file may have not been generated, or have been deleted or moved.
+
+### Example ###
+Download the log file of the FPGA image whose ID is **0086137b\*\*\*\*\*\*\*\*016535d03b210005**.
+<pre>
+[root@ ~]# fis get-log-file --fpga-image-id 0086137b********016535d03b210005
+Log directory is "obs-test-fpga:vu9p"
+Downloading Log file from OBS
+Success: 200 OK
+Download 2517 bytes using 0.078489 second(s)
+[root@ ~]# ls
+0086137b********016535d03b210005_log.tar
+</pre>

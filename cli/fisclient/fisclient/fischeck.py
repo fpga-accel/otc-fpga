@@ -27,13 +27,13 @@ def get_parser():
     parser = argparse.ArgumentParser(
         prog='fischeck',
         add_help=False)
+    parser.add_argument('--dcp-obs-path',
+                        action='store')
+    parser.add_argument('--log-obs-directory',
+                        action='store')
     parser.add_argument('--name',
                         action='store')
-    parser.add_argument('--metadata',
-                        action='store')
     parser.add_argument('--description',
-                        action='store')
-    parser.add_argument('--file-name',
                         action='store')
     parser.add_argument('--fpga-image-id',
                         action='store')
@@ -53,14 +53,14 @@ def main():
 
     # read and check args
     kwargs = {}
+    if args.dcp_obs_path is not None:
+        kwargs['dcp_obs_path'] = args.dcp_obs_path
+    if args.log_obs_directory is not None:
+        kwargs['log_obs_directory'] = args.log_obs_directory
     if args.name is not None:
         kwargs['name'] = args.name
-    if args.metadata is not None:
-        kwargs['metadata'] = args.metadata
     if args.description is not None:
         kwargs['description'] = args.description
-    if args.file_name is not None:
-        kwargs['file_name'] = args.file_name
     if args.fpga_image_id is not None:
         kwargs['fpga_image_id'] = args.fpga_image_id
     if args.image_id is not None:
@@ -78,14 +78,17 @@ def main():
     config.read_config_and_verify()
     access_key = os.getenv('OS_ACCESS_KEY')
     secret_key = os.getenv('OS_SECRET_KEY')
-    region_id = os.getenv('OS_REGION_ID')
     bucket_name = os.getenv('OS_BUCKET_NAME')
+    region_id = os.getenv('OS_REGION_ID')
     domain_id = os.getenv('OS_DOMAIN_ID')
     project_id = os.getenv('OS_PROJECT_ID')
     obs_endpoint = os.getenv('OS_OBS_ENDPOINT')
     fis_endpoint = os.getenv('OS_FIS_ENDPOINT')
 
     try:
+        # configure intranet dns of ecs
+        config.configure_intranet_dns_ecs(region_id)
+
         # check bucket
         utils._check_bucket_acl_location(bucket_name, access_key, secret_key,
                                          obs_endpoint, region_id, domain_id)
@@ -99,9 +102,6 @@ def main():
         print('fis argument(s) and config file are OK')
     else:
         print('fis config file is OK')
-
-    # check intranet dns
-    config.check_intranet_dns(region_id)
 
 
 if __name__ == '__main__':
