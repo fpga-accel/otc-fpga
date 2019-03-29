@@ -28,6 +28,9 @@ import requests
 from auth import sign_request_v4
 from parse_xml import getDictFromXml
 from exception import HttpException
+import config
+import encode
+import utils
 
 
 # disable insecure warning
@@ -73,7 +76,7 @@ def get_text_error(text, func=None):
 
 
 # response handler
-def resp_with_body_handler(resp):
+def resp_with_json_error(resp):
     if resp.status_code >= 300:
         func = sys._getframe().f_back.f_code.co_name
         raise HttpException(resp.status_code, resp.reason, get_json_error(resp.text, func))
@@ -84,11 +87,21 @@ def resp_with_body_handler(resp):
     return resp.status_code, resp.reason, resp_body
 
 
-def resp_without_body_handler(resp):
+def resp_without_body(resp):
     if resp.status_code >= 300:
         func = sys._getframe().f_back.f_code.co_name
         raise HttpException(resp.status_code, resp.reason, get_json_error(resp.text, func))
     return resp.status_code, resp.reason
+
+
+def resp_with_text_error(resp):
+    if resp.status_code >= 300:
+        func = sys._getframe().f_back.f_code.co_name
+        raise HttpException(resp.status_code, resp.reason, get_text_error(resp.text, func))
+    try:
+        return resp.json()
+    except Exception:
+        return dict()
 
 
 # obs
@@ -150,7 +163,8 @@ def make_bucket(ak, sk, bucket_name, location, host):
     return (resp.status_code, resp.reason)
 
 
-def put_object(ak, sk, file_name, bucket_name, object_key, host):
+@utils.retry_decorator
+def put_dcp_file(ak, sk, file_name, bucket_name, object_key, host):
     expand_file_name = os.path.expanduser(file_name)
     with open(expand_file_name, 'rb') as f:
         m = hashlib.md5()
@@ -186,6 +200,34 @@ def put_object(ak, sk, file_name, bucket_name, object_key, host):
         return (resp.status_code, resp.reason, content_length, time_diff)
 
 
+def get_log_file(ak, sk, file_name, bucket_name, object_key, host):
+    resource = '/%s/%s' % (bucket_name, object_key)
+    date = time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime())
+    string_to_sign = 'GET\n\n\n%s\n%s' % (date, resource)
+    signature = base64.b64encode(hmac.new(sk, string_to_sign, hashlib.sha1).digest())
+
+    t1 = datetime.datetime.now()
+    resp = requests.get(
+            'https://%s%s' % (host, resource),
+            headers={'Host': host,
+                     'Date': date,
+                     'Authorization': 'AWS %s:%s' % (ak, signature)},
+            timeout=timeout,
+            verify=cert_verify)
+    t2 = datetime.datetime.now()
+    time_diff = (t2 - t1).total_seconds()
+    if resp.status_code >= 300:
+        msg = get_xml_error(resp.text, args=(bucket_name, object_key))
+        if 'NoSuchKey' in msg:
+            msg += '\n\033[31mTips: The log file may have NOT been generated, or have been Deleted or Moved.\033[0m'
+        raise HttpException(resp.status_code, resp.reason, msg)
+
+    with open(file_name, 'wb') as f:
+        f.write(resp.content)
+
+    return (resp.status_code, resp.reason, len(resp.content), time_diff)
+
+
 # iam
 def get_project(ak, sk, region, host):
     headers = sign_request_v4(ak, sk, 'GET', host, '/v3/projects',
@@ -196,17 +238,49 @@ def get_project(ak, sk, region, host):
             headers=headers,
             timeout=timeout,
             verify=cert_verify)
-    if resp.status_code >= 300:
-        raise HttpException(resp.status_code, resp.reason, get_text_error(resp.text))
-    try:
-        return resp.json()
-    except Exception:
-        return dict()
+    return resp_with_text_error(resp)
+
+
+# ecs
+def get_os_interface(ak, sk, project_id, region, host, instance_id):
+    uri = '/v2/%s/servers/%s/os-interface' % (project_id, instance_id)
+    headers = sign_request_v4(ak, sk, 'GET', host, uri, region, 'ecs')
+    resp = requests.get(
+            'https://%s%s' % (host, uri),
+            headers=headers,
+            timeout=timeout,
+            verify=cert_verify)
+    return resp_with_text_error(resp)
+
+
+# vpc
+def get_subnet(ak, sk, project_id, region, host, net_id):
+    uri = '/v1/%s/subnets/%s' % (project_id, net_id)
+    headers = sign_request_v4(ak, sk, 'GET', host, uri, region, 'vpc')
+    resp = requests.get(
+            'https://%s%s' % (host, uri),
+            headers=headers,
+            timeout=timeout,
+            verify=cert_verify)
+    return resp_with_text_error(resp)
+
+
+def put_subnet(ak, sk, project_id, region, host, vpc_id, net_id, body):
+    uri = '/v1/%s/vpcs/%s/subnets/%s' % (project_id, vpc_id, net_id)
+    headers = sign_request_v4(ak, sk, 'PUT', host, uri, region, 'vpc', body=body)
+    headers['Content-Type'] = 'application/json;charset=utf8'
+    resp = requests.put(
+            'https://%s%s' % (host, uri),
+            headers=headers,
+            data=body,
+            timeout=timeout,
+            verify=cert_verify)
+    return resp_with_text_error(resp)
 
 
 # fis
-def fpga_image_register(ak, sk, project_id, region, host, fpga_image):
-    uri = '/v1/%s/cloudservers/fpga_image' % project_id
+def fpga_image_create(ak, sk, project_id, region, host, fpga_image):
+    uri = '/v2/%s/cloudservers/fpga_image' % project_id
     body = json.dumps({'fpga_image': fpga_image})
     headers = sign_request_v4(ak, sk, 'POST', host, uri, region, 'ecs', body=body)
     headers['Content-Type'] = 'application/json;charset=utf8'
@@ -216,7 +290,7 @@ def fpga_image_register(ak, sk, project_id, region, host, fpga_image):
             data=body,
             timeout=timeout,
             verify=cert_verify)
-    return resp_with_body_handler(resp)
+    return resp_with_json_error(resp)
 
 
 def fpga_image_delete(ak, sk, project_id, region, host, fpga_image_id):
@@ -227,7 +301,7 @@ def fpga_image_delete(ak, sk, project_id, region, host, fpga_image_id):
             headers=headers,
             timeout=timeout,
             verify=cert_verify)
-    return resp_without_body_handler(resp)
+    return resp_without_body(resp)
 
 
 def fpga_image_list(ak, sk, project_id, region, host, params=None):
@@ -243,7 +317,7 @@ def fpga_image_list(ak, sk, project_id, region, host, params=None):
             headers=headers,
             timeout=timeout,
             verify=cert_verify)
-    return resp_with_body_handler(resp)
+    return resp_with_json_error(resp)
 
 
 def fpga_image_relation_create(ak, sk, project_id, region, host, fpga_image_id, image_id):
@@ -257,7 +331,7 @@ def fpga_image_relation_create(ak, sk, project_id, region, host, fpga_image_id, 
             data=body,
             timeout=timeout,
             verify=cert_verify)
-    return resp_without_body_handler(resp)
+    return resp_without_body(resp)
 
 
 def fpga_image_relation_delete(ak, sk, project_id, region, host, fpga_image_id, image_id):
@@ -271,7 +345,7 @@ def fpga_image_relation_delete(ak, sk, project_id, region, host, fpga_image_id, 
             data=body,
             timeout=timeout,
             verify=cert_verify)
-    return resp_without_body_handler(resp)
+    return resp_without_body(resp)
 
 
 def fpga_image_relation_list(ak, sk, project_id, region, host, params=None):
@@ -287,4 +361,31 @@ def fpga_image_relation_list(ak, sk, project_id, region, host, params=None):
             headers=headers,
             timeout=timeout,
             verify=cert_verify)
-    return resp_with_body_handler(resp)
+    return resp_with_json_error(resp)
+
+
+# metadata
+def get_region_id_from_metadata():
+    try:
+        resp = requests.get('http://169.254.169.254/latest/meta-data/placement/availability-zone', timeout=10)
+        az = resp.text.strip()
+        if az in config.az_region_map:
+            return config.az_region_map.get(az)
+    except Exception as e:
+        utils.print_err('Get AZ from ECS metadata failed: %s' % encode.exception_to_unicode(e))
+    try:
+        resp = requests.get('http://169.254.169.254/openstack/latest/meta_data.json', timeout=10)
+        az = resp.json().get('availability_zone')
+        if az in config.az_region_map:
+            return config.az_region_map.get(az)
+    except Exception as e:
+        utils.print_err('Get AZ from ECS metadata failed: %s' % encode.exception_to_unicode(e))
+    utils.print_err('Could not get region_id from ECS metadata.')
+
+
+def get_instance_id_from_metadata():
+    try:
+        resp = requests.get('http://169.254.169.254/openstack/latest/meta_data.json', timeout=10)
+        return resp.json().get('uuid')
+    except Exception as e:
+        utils.print_err('Get instance_id from ECS metadata failed: %s' % encode.exception_to_unicode(e))
