@@ -61,7 +61,7 @@ Set the parameters listed in the following table.
 > After the configuration is complete, you can run the `fis configure --dump` command to view the current configuration.
 
 ### Step 1. Configure key parameters ###
-Before configuring key parameters, create and obtain an access key by following instructions in [Creating Access Keys](https://support.huaweicloud.com/en-us/clientogw-obs/en-us_topic_0045853769.html).
+Before configuring key parameters, create and obtain an access key.
 
 <pre>
 Access key and Secret key are your identifiers for FIS and OBS.
@@ -283,7 +283,7 @@ If user B wants to use a created FPGA image shared by user A, user B needs to pe
 
 - Step 1. Accept the ECS image shared by user A.
 - Step 2. Obtain the type of the FPGA image from user A. In this example, it is **general-purpose architecture**.
-- Step 3. Use the shared ECS image to create an FPGA Elastic Cloud Server with the same type as the shared FPGA image.
+- Step 3. Use the shared ECS image to create an FPGA Elastic Cloud Server with the same type as the shared FPGA image. In this example, user B needs to create an FPGA Elastic Cloud Server of **general-purpose architecture**.
 > Ensure that the type of the created FPGA Elastic Cloud Server is the same with that of the shared FPGA image.
 
 - Step 4. Obtain the image ID from the details page of the shared ECS image. In this example, it is **404223ca-8\*\*b-4\*\*2-a\*\*e-d187\*\*\*\*61bc**.
